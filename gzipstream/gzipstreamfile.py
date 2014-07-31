@@ -19,6 +19,8 @@ class GzipStreamFile(object):
       self.unused_buffer += self.decoder.decompress(unused_raw)
 
   def read(self, size):
+    # TODO: Update this to use unconsumed_tail and a StringIO buffer
+    # http://docs.python.org/2/library/zlib.html#zlib.Decompress.unconsumed_tail
     # Check if we need to start a new decoder
     if self.decoder and self.decoder.unused_data:
       self.restart_decoder()
@@ -41,6 +43,7 @@ class GzipStreamFile(object):
     return self.read(size)
 
   def readline(self):
+    # TODO: This should work in large chunks rather than a byte at a time
     chars = []
     c = self.read(1)
     while c != '\n':

@@ -11,10 +11,11 @@ This is highly inefficient as (a) a gzipped WARC file is composed of multiple in
 
 For detailed usage, see the examples folder, but minimally...
 
-    :::python
-    from gzipstream import GzipStreamFile
-    f = open('huge_file.gz') # Any streaming file object that supports `read`
-    gz = GzipStreamFile(f)
+```python
+from gzipstream import GzipStreamFile
+f = open('huge_file.gz') # Any streaming file object that supports `read`
+gz = GzipStreamFile(f)
+```
 
 # License
 
