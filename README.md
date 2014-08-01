@@ -1,15 +1,21 @@
 # gzipstream
 
 `gzipstream` allows Python to process multi-part gzip files from a streaming source.
-Primarily intended for use with the [warc library](http://warc.readthedocs.org/en/latest/) for processing [Common Crawl](http://commoncrawl.org/) and other web archive data.
+The library is originally intended for use with the Python [warc library](http://warc.readthedocs.org/en/latest/) for processing [Common Crawl](http://commoncrawl.org/) and other web archive data.
 
-As an example of usage, `examples / streaming_commoncrawl_from_s3.py` shows how `gzipstream` can be used with `boto` and `warc` to process a randomly selected gzip web archive (WARC) from the 2014-15 Common Crawl dataset.
-Without `gzipstream`, processing of the file would only be possible by fully downloading it.
-This is highly inefficient as (a) a gzipped WARC file is composed of multiple independent gzip files and (b) the WARC file is hunderds of megabytes in size.
+# Installation
+
+If you are using pip, simply run the command `pip install -e git+https://github.com/commoncrawl/gzipstream.git#egg=gzipstream`.
+You can also install using `python setup.py install` if so desired.
 
 # Usage
 
-For detailed usage, see the examples folder, but minimally...
+As an example of usage, `examples/streaming_commoncrawl_from_s3.py` shows how `gzipstream` can be used to incrementally process a gzipped web archive (WARC) file.
+The file is almost a gigabyte in size, selected randomly from the 2014-15 Common Crawl dataset and hosted on Amazon S3.
+Without `gzipstream`, processing of the file would only be possible by fully downloading it.
+This is highly inefficient as (a) a gzipped WARC file is composed of multiple independent gzip files and (b) the WARC file is hunderds of megabytes in size.
+
+For minimal usage however...
 
 ```python
 from gzipstream import GzipStreamFile
