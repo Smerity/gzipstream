@@ -2,7 +2,7 @@ import zlib
 
 
 class GzipStreamFile(object):
-  READ_SIZE = 1024 * 8
+  READ_SIZE = 1024 * 4
 
   def __init__(self, stream):
     self.stream = stream
