@@ -1,15 +1,15 @@
+import io
 import zlib
 
 
-class GzipStreamFile(object):
-  READ_SIZE = 1024 * 4
-
+class _GzipStreamFile(object):
   def __init__(self, stream):
     self.stream = stream
     self.decoder = None
     self.restart_decoder()
     ###
     self.unused_buffer = ''
+    self.closed = False
     self.finished = False
 
   def restart_decoder(self):
@@ -35,20 +35,44 @@ class GzipStreamFile(object):
       buf, self.unused_buffer = self.unused_buffer, ''
       return buf
     # Otherwise consume new data
-    raw = self.stream.read(GzipStreamFile.READ_SIZE)
-    if len(raw):
+    raw = self.stream.read(io.DEFAULT_BUFFER_SIZE)
+    if len(raw) > 0:
       self.unused_buffer += self.decoder.decompress(raw)
     else:
       self.finished = True
     return self.read(size)
 
-  def readline(self):
-    # TODO: This should work in large chunks rather than a byte at a time
-    chars = []
-    c = self.read(1)
-    while c and c != '\n':
-      chars.append(c)
-      c = self.read(1)
-    chars.append(c)
-    line = ''.join(chars)
-    return line
+  def readinto(self, b):
+    # Read up to len(b) bytes into bytearray b
+    # Sadly not as efficient as lower level
+    data = self.read(len(b))
+    if not data:
+      return None
+    b[:len(data)] = data
+    return len(data)
+
+  def readable(self):
+    # io.BufferedReader needs us to appear readable
+    return True
+
+
+class GzipStreamFile(io.BufferedReader):
+  def __init__(self, stream):
+    self._gzipstream = _GzipStreamFile(stream)
+    super(GzipStreamFile, self).__init__(self._gzipstream)
+
+  def read(self, *args, **kwargs):
+    # Patch read to return '' instead of raise Value Error
+    try:
+      result = super(GzipStreamFile, self).read(*args, **kwargs)
+      return result
+    except ValueError:
+      return ''
+
+  def readline(self, *args, **kwargs):
+    # Patch readline to return '' instead of raise Value Error
+    try:
+      result = super(GzipStreamFile, self).readline(*args, **kwargs)
+      return result
+    except ValueError:
+      return ''
